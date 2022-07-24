@@ -1,4 +1,5 @@
 import os.path
+import time
 from typing import *
 
 from mcdreforged.api.decorator import new_thread
@@ -29,6 +30,17 @@ class BloomingBlossomLogger(MCDReforgedLogger):
 
     def set_verbose(self, verbosity: bool):
         self.__verbosity = verbosity
+        self.debug('Verbose mode enabled')
+
+    def set_file(self, file_name: str):
+        self.unload_file()
+        super().set_file(file_name=file_name)
+
+    def unload_file(self):
+        if self.file_handler is not None:
+            self.removeHandler(self.file_handler)
+            self.file_handler.close()
+            self.file_handler = None
 
 
 def tr(translation_key: str, *args, with_prefix=True, **kwargs) -> RTextMCDRTranslation:

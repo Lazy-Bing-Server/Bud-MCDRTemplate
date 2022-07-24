@@ -5,7 +5,7 @@ from mcdreforged.api.types import CommandSource
 from mcdreforged.api.rtext import *
 from mcdreforged.api.command import *
 
-from bud.utils import gl_server, tr, ntr
+from bud.utils import gl_server, tr, ntr, logger
 from bud.config import config
 
 
@@ -34,6 +34,7 @@ def htr(key: str, *args, **kwargs) -> Union[str, RTextBase]:
 
 
 def reload_self(source: CommandSource):
+    logger.unload_file()
     gl_server.reload_plugin(gl_server.get_self_metadata().id)
     source.reply(tr('msg.reloaded'))
 
