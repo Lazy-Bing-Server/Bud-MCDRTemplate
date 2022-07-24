@@ -1,4 +1,4 @@
-my_plugin:
+bud:
   help:
     mcdr: Hello world from my plugin!
     detailed: |
@@ -9,3 +9,7 @@ my_plugin:
 
   msg:
     reloaded: Plugin reloaded
+
+  load_config:
+    validation_error_handle: "Fixed invalid keys with default value: {0}"
+    missing_keys_handle: "Fixed missing keys with default value: {keys}"

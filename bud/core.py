@@ -41,7 +41,7 @@ def register_command():
         literals = {literals} if isinstance(literals, str) else set(literals)
         perm = 1
         for item in literals:
-            target_perm = config.get_prem(item)
+            target_perm = config.get_perm(item)
             if target_perm > perm:
                 perm = target_perm
         return Literal(literals).requires(lambda src: src.has_permission(target_perm))
