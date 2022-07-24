@@ -1,8 +1,8 @@
 from mcdreforged.api.all import *
 
-from .utils import tr
-from .config import config
-from .core import register_command
+from bud.utils import tr
+from bud.config import config
+from bud.core import register_command
 
 
 def on_load(server: PluginServerInterface, prev_module):

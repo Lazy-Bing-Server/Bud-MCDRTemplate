@@ -3,11 +3,10 @@ import os
 from pydantic import BaseModel, validator, ValidationError
 from pydantic.fields import ModelField
 from enum import EnumMeta
-from typing import Union, List, Any
+from typing import Union, List
 from ruamel import yaml
 
-from bud.utils import gl_server, logger, tr
-
+from bud.utils import gl_server, logger, tr, get_multi_layer_key
 
 CONFIG_PATH = os.path.join(gl_server.get_data_folder(), 'config.yml')
 
@@ -30,11 +29,12 @@ def allow_blanks(*types: type):
     return ret
 
 
-class BlossomConfigModel(BaseModel):
+class BlossomSerializer(BaseModel):
     # It's impossible to make both pycharm & pydantic happy
     # Due to pydantic force the first parameter name to "cls"
     class Config:
         arbitrary_types_allowed = True
+        extra = 'ignore'
 
     @validator('*', pre=True, allow_reuse=True)
     def ensure_enum(cls, v, *, field: ModelField = None):
@@ -55,7 +55,7 @@ class BlossomConfigModel(BaseModel):
         return return_dict
 
 
-class SingleErrorMessage(BlossomConfigModel):
+class SingleErrorMessage(BlossomSerializer):
     loc: List[str] = []
     msg: str = ''
     type: str = ''
@@ -65,11 +65,11 @@ class SingleErrorMessage(BlossomConfigModel):
         return self.loc.copy()
 
 
-class PermissionRequirements(BlossomConfigModel):
+class PermissionRequirements(BlossomSerializer):
     reload: int = 3
 
 
-class Configuration(BlossomConfigModel):
+class Configuration(BlossomSerializer):
     command_prefix: Union[str, List[str]] = '!!template'
     permission_requirements: PermissionRequirements = PermissionRequirements()
     verbosity: allow_blanks(bool) = _BLANK
@@ -166,18 +166,6 @@ class Configuration(BlossomConfigModel):
         with open(CONFIG_PATH, 'w', encoding='UTF-8') as f:
             logger.debug(to_save)
             yaml.round_trip_dump(to_save, f, allow_unicode=True)
-
-
-def get_multi_layer_key(data: Any, keys: list):
-    if len(keys) == 0:
-        return data
-    if not isinstance(data, dict):
-        return None
-    keys = keys.copy()
-    next_layer = data[keys.pop(0)]
-    if len(keys) == 0:
-        return next_layer
-    return get_multi_layer_key(next_layer, keys)
 
 
 config: Configuration = Configuration.load()
