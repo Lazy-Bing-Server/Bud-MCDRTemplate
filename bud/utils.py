@@ -15,12 +15,7 @@ unnamed_thread_count = 0
 
 class BloomingBlossomLogger(MCDReforgedLogger):
     __verbosity = False
-
-    def debug(self, *args, option=None, no_check: bool = False):
-        if self.__verbosity:
-            super(BloomingBlossomLogger, self).debug(*args, option, no_check=True)
-        elif option is not None:
-            super(BloomingBlossomLogger, self).debug(*args, option)
+    __instance: Optional["BloomingBlossomLogger"] = None
 
     @classmethod
     def should_log_debug(cls, option=None):
@@ -28,9 +23,16 @@ class BloomingBlossomLogger(MCDReforgedLogger):
             return True
         return super().should_log_debug(option=option)
 
-    def set_verbose(self, verbosity: bool):
-        self.__verbosity = verbosity
-        self.debug('Verbose mode enabled')
+    @classmethod
+    def set_verbose(cls, verbosity: bool):
+        cls.__verbosity = verbosity
+        cls.get_instance().debug('Verbose mode enabled')
+
+    @classmethod
+    def get_instance(cls):
+        if cls.__instance is None:
+            cls.__instance = cls(plugin_id=gl_server.get_self_metadata().id)
+        return cls.__instance
 
     def set_file(self, file_name: str):
         self.unload_file()
@@ -102,5 +104,5 @@ def ensure_dir(folder: str):
 
 
 ensure_dir(os.path.dirname(LOG_FILE))
-logger = BloomingBlossomLogger(plugin_id=gl_server.get_self_metadata().id)
+logger = BloomingBlossomLogger.get_instance()
 logger.set_file(LOG_FILE)
