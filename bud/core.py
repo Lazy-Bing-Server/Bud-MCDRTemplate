@@ -5,8 +5,15 @@ from mcdreforged.api.types import CommandSource
 from mcdreforged.api.rtext import *
 from mcdreforged.api.command import *
 
-from bud.utils import gl_server, tr, ntr, logger
+from bud.utils import gl_server, tr, ntr, logger, named_thread
 from bud.config import config
+
+
+def debug_permed_literal(literals: Union[str, Iterable[str]]) -> Literal:
+    perm = config.get_perm('debug')
+    if perm is None:
+        perm = 4
+    return Literal(literals).requires(lambda src: src.has_permission(perm))
 
 
 def show_help(source: CommandSource):
@@ -34,7 +41,6 @@ def htr(key: str, *args, **kwargs) -> Union[str, RTextBase]:
 
 
 def reload_self(source: CommandSource):
-    logger.unload_file()
     gl_server.reload_plugin(gl_server.get_self_metadata().id)
     source.reply(tr('msg.reloaded'))
 

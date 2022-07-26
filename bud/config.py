@@ -67,6 +67,7 @@ class SingleErrorMessage(BlossomSerializer):
 
 class PermissionRequirements(BlossomSerializer):
     reload: int = 3
+    debug: allow_blanks(bool) = _BLANK
 
 
 class Configuration(BlossomSerializer):

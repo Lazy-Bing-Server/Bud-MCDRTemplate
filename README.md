@@ -9,4 +9,4 @@ Install all the requirements with command `python -m pip install -r requirements
 
 Try `python -m mcdreforged pack` to generate the packed plugin!
 
-This template is under the MIT license.
+This template is under the LGPL-v3 license.

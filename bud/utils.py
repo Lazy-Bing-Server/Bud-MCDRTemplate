@@ -63,25 +63,28 @@ def ntr(translation_key: str, *args, with_prefix: bool = True, language: Optiona
         )
 
 
-def named_thread(thread_name: Union[Callable, str, None] = None):
-    global unnamed_thread_count
-    prefix = f'{gl_server.get_self_metadata().name}_'
+def to_camel_case(name_with_underscore: str):
+    return ''.join([element.capitalize() for element in name_with_underscore.split('_')])
 
+
+# This could not be used in solo plugin
+def named_thread(thread_name: Union[Callable, str, None] = None):
+    prefix = f'{gl_server.get_self_metadata().name}_'.replace(' ', '')
     if isinstance(thread_name, Callable):
         # Directly called without bracket
-        unnamed_thread_count += 1
-        unnamed_thread_name = prefix + f'Thread_{unnamed_thread_count}'
+        unnamed_thread_name = prefix + to_camel_case(thread_name.__name__)
         return new_thread(unnamed_thread_name)(thread_name)
     else:
-        if thread_name is None:
-            unnamed_thread_count += 1
-            thread_name = f'Thread_{unnamed_thread_count}'
-        if not isinstance(thread_name, str):
-            thread_name = str(thread_name)
-        # Called with name
-        if not thread_name.startswith(prefix):
-            thread_name = prefix + thread_name
-        return new_thread(thread_name)
+        def wrap(func):
+            nonlocal thread_name
+            if thread_name is None:
+                thread_name = to_camel_case(func.__name__)
+            if not isinstance(thread_name, str):
+                thread_name = str(thread_name)
+            if not thread_name.startswith(prefix):
+                thread_name = prefix + thread_name
+            return new_thread(thread_name)(func)
+        return wrap
 
 
 def get_multi_layer_key(data: Any, keys: list):
