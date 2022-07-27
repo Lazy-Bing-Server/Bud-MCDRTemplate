@@ -92,8 +92,8 @@ class Configuration(BlossomSerializer):
     def primary_prefix(self) -> str:
         return self.prefix[0]
 
-    def get_perm(self, cmd: str) -> int:
-        return self.permission_requirements.dict().get(cmd, 1)
+    def get_perm(self, cmd: str, default: int = 1) -> int:
+        return self.permission_requirements.dict().get(cmd, default)
 
     @classmethod
     def load(cls, echo_in_console: bool = True) -> 'Configuration':

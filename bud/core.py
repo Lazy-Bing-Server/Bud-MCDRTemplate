@@ -10,9 +10,7 @@ from bud.config import config
 
 
 def debug_permed_literal(literals: Union[str, Iterable[str]]) -> Literal:
-    perm = config.get_perm('debug')
-    if perm is None:
-        perm = 4
+    perm = config.get_perm('debug', 4)
     return Literal(literals).requires(lambda src: src.has_permission(perm))
 
 
